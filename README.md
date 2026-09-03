@@ -86,38 +86,33 @@ go test ./...
 ## Publishing (maintainers)
 
 Go modules are published by **git tags**, not a package registry token.
-[pkg.go.dev](https://pkg.go.dev) and `proxy.golang.org` index a tag the first
-time someone `go get`s it (or when you ping the proxy).
 
 CI lives in [`.github/workflows/publish.yml`](.github/workflows/publish.yml). Pull
-requests and pushes to `main` run `go test ./...`. Pushing a `v*.*.*` tag also
-creates a GitHub Release.
+requests only run tests. A release on `main` (or `workflow_dispatch`) commits
+`VERSION`, pushes it as the Kryptic Release Bot, tags `vX.Y.Z`, and opens a
+GitHub Release. The workflow pings `proxy.golang.org` so pkg.go.dev can index
+the tag.
 
 ### GitHub Actions secrets
 
-**None.** `GITHUB_TOKEN` is issued automatically and is enough to create the
-GitHub Release on a version tag. Do not add npm or NuGet tokens to this repo.
+Add these at the org or on the GitHub repo (`Settings` > `Secrets and variables` > `Actions`):
+
+| Secret | What it is | Where to get it |
+| --- | --- | --- |
+| `RELEASE_BOT_APP_ID` | App ID of **Kryptic Release Bot** | GitHub App settings |
+| `RELEASE_BOT_PRIVATE_KEY` | Private key `.pem` of that app | GitHub App settings > Generate a private key |
+
+Do not add npm or NuGet tokens to this repo.
 
 ### First publish
 
 1. Create the public GitHub repository `dev-kryptic/Kryptic.Encryption.Go`.
-2. Push `main`.
-3. Tag and push the first version:
+2. Add the Release Bot secrets (org-wide is enough).
+3. Push `main`. The workflow tags `v1.0.0` from `VERSION` on the first run.
 
-```
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-4. Optional: prime the module proxy so pkg.go.dev documents it immediately:
-
-```
-curl "https://proxy.golang.org/github.com/dev-kryptic/Kryptic.Encryption.Go/@v/v1.0.0.info"
-```
-
-Subsequent releases are the same: bump nothing in source, tag `v1.0.1` (patch)
-or `v1.1.0` / `v2.0.0` (format changes), push the tag. Keep major.minor aligned
-with the .NET and npm packages when the wire format changes.
+Keep major.minor aligned with the .NET and npm packages when the wire format
+changes. To ship `1.1.0` or `2.0.0`, set `VERSION` (or pass it to
+`workflow_dispatch`).
 
 ## Reporting vulnerabilities
 
