@@ -29,15 +29,13 @@ and [Kryptic.Encryption.NPM](https://github.com/dev-kryptic/Kryptic.Encryption.N
 
 ## Releasing
 
-A merge to `main` is the release. The publish workflow commits the version bump as
-the Kryptic Release Bot, tags `vX.Y.Z`, and opens a GitHub Release using the
-matching section in [CHANGELOG.md](CHANGELOG.md). The module is indexed on
-pkg.go.dev when someone `go get`s the tag.
-
-Leave release-worthy notes under **Unreleased**. The publish workflow creates
-the `## X.Y.Z` section from that body if it is missing (or a one-line fallback)
-and commits it. Format changes must ship in
-all three encryption repositories in the same release.
+Merges to `main` run tests only. Publish by pushing a `vX.Y.Z` tag (or
+re-running the workflow with that tag). The tag is the module version. The
+module is indexed on pkg.go.dev when someone `go get`s the tag. Leave
+release-worthy notes under **Unreleased**. The publish job creates the
+`## X.Y.Z` section from that body if it is missing (or a one-line fallback).
+Format changes must ship in all three encryption repositories in the same
+release.
 
 ## Licensing of contributions
 
